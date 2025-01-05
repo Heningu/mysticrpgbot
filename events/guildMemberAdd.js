@@ -1,8 +1,11 @@
-﻿// events/guildMemberAdd.js
+﻿const config = require('../data/config.json');
+
 module.exports = {
     name: 'guildMemberAdd',
-    async execute(member, client) {
-        const role = member.guild.roles.cache.find(r => r.name === 'Adventurer'); // Replace 'Member' with your role name
+    async execute(member) {
+        const newMemberRoleName = config.newMemberRoleName || 'Adventurer';
+        const role = member.guild.roles.cache.find(r => r.name === newMemberRoleName);
+
         if (role) {
             try {
                 await member.roles.add(role);
@@ -11,7 +14,7 @@ module.exports = {
                 console.error(`Failed to assign role: ${error}`);
             }
         } else {
-            console.log('Role not found');
+            console.log(`Role "${newMemberRoleName}" not found`);
         }
     },
 };

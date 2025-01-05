@@ -1,12 +1,12 @@
-﻿// events/messageCreate.js
-const config = require('../config.json');
+﻿const config = require('../data/config.json');
 
 module.exports = {
     name: 'messageCreate',
-    async execute(message, client) {
+    async execute(message) {
+        // Ignore bots
         if (message.author.bot) return;
 
-        // Check if the message is in a filtered channel
+        // Only filter if channel name is in filteredChannels
         if (!config.filteredChannels.includes(message.channel.name)) return;
 
         // Check for bad words
@@ -17,7 +17,6 @@ module.exports = {
             try {
                 await message.delete();
                 await message.channel.send(`${message.author}, please avoid using inappropriate language.`);
-                // Optionally, log the incident or take further action
             } catch (error) {
                 console.error(`Failed to delete message or send warning: ${error}`);
             }

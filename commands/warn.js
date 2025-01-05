@@ -1,31 +1,35 @@
-﻿// commands/warn.js
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+﻿const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const config = require('../data/config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('warn')
         .setDescription('Warns a member')
         .addUserOption(option =>
-            option.setName('target')
+            option
+                .setName('target')
                 .setDescription('The member to warn')
-                .setRequired(true))
+                .setRequired(true)
+        )
         .addStringOption(option =>
-            option.setName('reason')
+            option
+                .setName('reason')
                 .setDescription('Reason for the warning')
-                .setRequired(true)),
+                .setRequired(true)
+        ),
     async execute(interaction) {
+        const adminRoleId = config.adminRoleId;
+        const warnedRoleName = config.warnRoleName || 'Warned';
 
-        const adminRoleId = '1273989601102532608'; // Replace with your actual admin role ID
-
+        // Double-check role
         if (!interaction.member.roles.cache.has(adminRoleId)) {
             return interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
         }
-        
-        
-        // Permission check
-        if (!interaction.member.permissions.has('MANAGE_ROLES')) {
-            return interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
+
+        // Also check if the user has MANAGE_ROLES
+        if (!interaction.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
+            return interaction.reply({ content: 'You need MANAGE_ROLES permission to use this command.', ephemeral: true });
         }
 
         const target = interaction.options.getUser('target');
@@ -36,13 +40,13 @@ module.exports = {
             return interaction.reply({ content: 'Member not found.', ephemeral: true });
         }
 
-        // Assign 'Warned' role
-        let warnedRole = interaction.guild.roles.cache.find(r => r.name === 'Warned');
+        // Assign or create the "Warned" role
+        let warnedRole = interaction.guild.roles.cache.find(r => r.name === warnedRoleName);
         if (!warnedRole) {
             // Create the role if it doesn't exist
             try {
                 warnedRole = await interaction.guild.roles.create({
-                    name: 'Warned',
+                    name: warnedRoleName,
                     color: '#FFA500',
                     reason: 'Role for warned members',
                 });
@@ -59,8 +63,8 @@ module.exports = {
             return interaction.reply({ content: 'Failed to assign Warned role.', ephemeral: true });
         }
 
-        // Send embedded warning message
-        const embed = new MessageEmbed()
+        // Send embedded warning message in DM
+        const embed = new EmbedBuilder()
             .setTitle('You have been warned')
             .setDescription(`**Reason:** ${reason}`)
             .setColor('#FFA500')
@@ -72,7 +76,6 @@ module.exports = {
             console.error(`Could not send DM to ${member.user.tag}.`);
         }
 
-        // Inform in the channel
         await interaction.reply({ content: `${member.user.tag} has been warned.`, ephemeral: false });
     },
 };

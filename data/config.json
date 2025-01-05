@@ -1,0 +1,21 @@
+﻿{
+  "adminRoleId": "1273989601102532608",
+  "staffRoleName": "Ticket-Support",
+  "warnRoleName": "Warned",
+  "newMemberRoleName": "Adventurer",
+  "logChannelId": "1275231946380808294",
+
+  "badWords": ["badword1", "badword2", "badword3"],
+  "filteredChannels": [
+    "💬︙general",
+    "💬︙off-topic",
+    "💬︙trading",
+    "💬︙dungeon-group-search",
+    "💬︙guild-ads"
+  ],
+
+  "voiceChannel": {
+    "mainVoiceChannelId": "1275228273051439144",
+    "categoryId": "1275228054481801306"
+  }
+}
